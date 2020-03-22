@@ -13,7 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eShopSolution.Utilities", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eShopSolution.ViewModels", "eShopSolution.ViewModels\eShopSolution.ViewModels.csproj", "{403D4FD3-AF88-4D64-9A18-F0A0DE09F153}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShopSolutionBackendApi", "eShopSolutionBackendApi\eShopSolutionBackendApi.csproj", "{DCCBF495-F47E-4ECC-9E35-49F5E4F748C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eShopSolutionBackendApi", "eShopSolutionBackendApi\eShopSolutionBackendApi.csproj", "{DCCBF495-F47E-4ECC-9E35-49F5E4F748C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.Infrastructure", "1.Infrastructure", "{BBFBF9CF-2749-47D3-B5A7-3418AB2CA549}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.Domain", "2.Domain", "{882F40FB-599A-453E-A3EA-35EAACD96BAF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.Host", "3.Host", "{45BA7F5C-0C7E-441E-ABFC-F18A401B9EF3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0.Solution Items", "0.Solution Items", "{2567E465-B2C8-4F04-B28E-C34A61E33C39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +56,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3FB5E203-64ED-4A69-9E81-013FF8419D22} = {45BA7F5C-0C7E-441E-ABFC-F18A401B9EF3}
+		{418A550E-4F72-4170-A5C5-07ECC23EBE9F} = {882F40FB-599A-453E-A3EA-35EAACD96BAF}
+		{5BF73E2B-45BB-466F-AEE0-E7088C2C0EC1} = {882F40FB-599A-453E-A3EA-35EAACD96BAF}
+		{3D8BBBC6-9187-47BA-A9F3-17476761A364} = {BBFBF9CF-2749-47D3-B5A7-3418AB2CA549}
+		{403D4FD3-AF88-4D64-9A18-F0A0DE09F153} = {BBFBF9CF-2749-47D3-B5A7-3418AB2CA549}
+		{DCCBF495-F47E-4ECC-9E35-49F5E4F748C4} = {45BA7F5C-0C7E-441E-ABFC-F18A401B9EF3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E06EC3C6-6DFD-4CD4-9FA3-51671AECE538}
