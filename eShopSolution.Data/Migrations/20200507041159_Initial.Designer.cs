@@ -10,14 +10,14 @@ using eShopSolution.Data.EF;
 namespace eShopSolution.Data.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    [Migration("20200314141419_AspNetCoreIdentityDatabase")]
-    partial class AspNetCoreIdentityDatabase
+    [Migration("20200507041159_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.2")
+                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -94,6 +94,13 @@ namespace eShopSolution.Data.Migrations
                     b.HasKey("UserId", "RoleId");
 
                     b.ToTable("AppUserRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("194e1ed3-45b3-42fb-81be-44db403bb56b"),
+                            RoleId = new Guid("07fe94ae-f960-442b-badc-3417826f6fd5")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -170,6 +177,16 @@ namespace eShopSolution.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AppRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("07fe94ae-f960-442b-badc-3417826f6fd5"),
+                            ConcurrencyStamp = "395279ff-9636-4fc3-aabf-98ff78dd72f6",
+                            Description = "Adminstrator role",
+                            Name = "admin",
+                            NormalizedName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("eShopSolution.Data.Entities.AppUser", b =>
@@ -236,6 +253,27 @@ namespace eShopSolution.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AppUsers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("194e1ed3-45b3-42fb-81be-44db403bb56b"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b0b4f95e-90d8-4693-8dd5-281bea4ece66",
+                            Dob = new DateTime(2020, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "an@dhpd.edu.com",
+                            EmailConfirmed = true,
+                            FirstName = "AN",
+                            LastName = "Pham",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "an@dhpd.edu.com",
+                            NormalizedUserName = "admin",
+                            PasswordHash = "AQAAAAEAACcQAAAAEPUYQWAckGjPCi06zLx6pl5ejQ2vnmOkRxc/6e4zQ91+f/buA49rixYaiJpVft+Z3Q==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("eShopSolution.Data.Entities.Cart", b =>
@@ -482,9 +520,7 @@ namespace eShopSolution.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("OrderDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2020, 3, 14, 21, 14, 18, 17, DateTimeKind.Local).AddTicks(1299));
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ShipAddress")
                         .IsRequired()
@@ -578,7 +614,7 @@ namespace eShopSolution.Data.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2020, 3, 14, 21, 14, 18, 81, DateTimeKind.Local).AddTicks(1047),
+                            DateCreated = new DateTime(2020, 5, 7, 11, 11, 58, 226, DateTimeKind.Local).AddTicks(8833),
                             OriginalPrice = 100000m,
                             Price = 200000m,
                             Stock = 0,
@@ -591,10 +627,13 @@ namespace eShopSolution.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1)
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Caption")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -603,7 +642,9 @@ namespace eShopSolution.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("ImagePath")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
@@ -618,7 +659,7 @@ namespace eShopSolution.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImage");
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("eShopSolution.Data.Entities.ProductInCategory", b =>

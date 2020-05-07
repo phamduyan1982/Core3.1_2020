@@ -20,7 +20,78 @@ namespace eShopSolution.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AppUser",
+                name: "AppRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<Guid>(nullable: false),
+                    ClaimType = table.Column<string>(nullable: true),
+                    ClaimValue = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppRoleClaims", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppRoles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    NormalizedName = table.Column<string>(nullable: true),
+                    ConcurrencyStamp = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<Guid>(nullable: false),
+                    ClaimType = table.Column<string>(nullable: true),
+                    ClaimValue = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppUserClaims", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppUserLogins",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(nullable: false),
+                    LoginProvider = table.Column<string>(nullable: true),
+                    ProviderKey = table.Column<string>(nullable: true),
+                    ProviderDisplayName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppUserLogins", x => x.UserId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(nullable: false),
+                    RoleId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppUserRoles", x => new { x.UserId, x.RoleId });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppUsers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -38,13 +109,27 @@ namespace eShopSolution.Data.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
+                    FirstName = table.Column<string>(maxLength: 200, nullable: false),
+                    LastName = table.Column<string>(maxLength: 200, nullable: false),
                     Dob = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AppUser", x => x.Id);
+                    table.PrimaryKey("PK_AppUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(nullable: false),
+                    LoginProvider = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    Value = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppUserTokens", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
@@ -138,7 +223,7 @@ namespace eShopSolution.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderDate = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 3, 14, 14, 34, 40, 779, DateTimeKind.Local).AddTicks(5109)),
+                    OrderDate = table.Column<DateTime>(nullable: false),
                     UserId = table.Column<Guid>(nullable: false),
                     ShipName = table.Column<string>(maxLength: 200, nullable: false),
                     ShipAddress = table.Column<string>(maxLength: 200, nullable: false),
@@ -150,9 +235,9 @@ namespace eShopSolution.Data.Migrations
                 {
                     table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Orders_AppUser_UserId",
+                        name: "FK_Orders_AppUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "AppUser",
+                        principalTable: "AppUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -171,17 +256,17 @@ namespace eShopSolution.Data.Migrations
                     Message = table.Column<string>(nullable: true),
                     Status = table.Column<int>(nullable: false),
                     Provider = table.Column<string>(nullable: true),
-                    AppUserId = table.Column<Guid>(nullable: true)
+                    UserId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Transactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transactions_AppUser_AppUserId",
-                        column: x => x.AppUserId,
-                        principalTable: "AppUser",
+                        name: "FK_Transactions_AppUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AppUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -236,22 +321,22 @@ namespace eShopSolution.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Carts_AppUser_UserId",
+                        name: "FK_Carts_AppUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "AppUser",
+                        principalTable: "AppUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductImage",
+                name: "ProductImages",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(nullable: false),
-                    ImagePath = table.Column<string>(nullable: true),
-                    Caption = table.Column<string>(nullable: true),
+                    ImagePath = table.Column<string>(maxLength: 200, nullable: false),
+                    Caption = table.Column<string>(maxLength: 200, nullable: true),
                     IsDefault = table.Column<bool>(nullable: false),
                     DateCreated = table.Column<DateTime>(nullable: false),
                     SortOrder = table.Column<int>(nullable: false),
@@ -259,9 +344,9 @@ namespace eShopSolution.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductImage", x => x.Id);
+                    table.PrimaryKey("PK_ProductImages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductImage_Products_ProductId",
+                        name: "FK_ProductImages_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -350,6 +435,79 @@ namespace eShopSolution.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "AppConfigs",
+                columns: new[] { "Key", "Value" },
+                values: new object[,]
+                {
+                    { "HomeTitle", "This is home page of eShopSolution" },
+                    { "HomeKeyword", "This is key word of eShopSolution" },
+                    { "HomeDescription", "This is description of eShopSolution" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AppRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Description", "Name", "NormalizedName" },
+                values: new object[] { new Guid("07fe94ae-f960-442b-badc-3417826f6fd5"), "395279ff-9636-4fc3-aabf-98ff78dd72f6", "Adminstrator role", "admin", "admin" });
+
+            migrationBuilder.InsertData(
+                table: "AppUserRoles",
+                columns: new[] { "UserId", "RoleId" },
+                values: new object[] { new Guid("194e1ed3-45b3-42fb-81be-44db403bb56b"), new Guid("07fe94ae-f960-442b-badc-3417826f6fd5") });
+
+            migrationBuilder.InsertData(
+                table: "AppUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Dob", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { new Guid("194e1ed3-45b3-42fb-81be-44db403bb56b"), 0, "b0b4f95e-90d8-4693-8dd5-281bea4ece66", new DateTime(2020, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), "an@dhpd.edu.com", true, "AN", "Pham", false, null, "an@dhpd.edu.com", "admin", "AQAAAAEAACcQAAAAEPUYQWAckGjPCi06zLx6pl5ejQ2vnmOkRxc/6e4zQ91+f/buA49rixYaiJpVft+Z3Q==", null, false, "", false, "admin" });
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Id", "IsShowOnHome", "ParentId", "SortOrder", "Status" },
+                values: new object[,]
+                {
+                    { 1, true, null, 1, 1 },
+                    { 2, true, null, 2, 1 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Languages",
+                columns: new[] { "Id", "IsDefault", "Name" },
+                values: new object[,]
+                {
+                    { "vi-VN", true, "Tiếng Việt" },
+                    { "vi-US", false, "English" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Products",
+                columns: new[] { "Id", "DateCreated", "OriginalPrice", "Price", "SeoAlias" },
+                values: new object[] { 1, new DateTime(2020, 5, 7, 11, 11, 58, 226, DateTimeKind.Local).AddTicks(8833), 100000m, 200000m, null });
+
+            migrationBuilder.InsertData(
+                table: "CategoryTranslations",
+                columns: new[] { "Id", "CategoryId", "LanguageId", "Name", "SeoAlias", "SeoDescription", "SeoTitle" },
+                values: new object[,]
+                {
+                    { 1, 1, "vi-VN", "Áo nam", "ao-nam", "Sản phẩm áo thời trang nam", "Sản phẩm áo thời trang nam" },
+                    { 3, 2, "vi-VN", "Áo nữ", "ao-nu", "Sản phẩm áo thời trang nữ", "Sản phẩm áo thời trang nữ" },
+                    { 2, 1, "vi-US", "Men Shirt", "men-shirt", "The shirt products for men", "The shirt products for men" },
+                    { 4, 2, "vi-US", "Women Shirt", "women-shirt", "The shirt products for women", "The shirt products for women" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ProductInCategories",
+                columns: new[] { "CategoryId", "ProductId" },
+                values: new object[] { 1, 1 });
+
+            migrationBuilder.InsertData(
+                table: "ProductTranslations",
+                columns: new[] { "Id", "Description", "Details", "LanguageId", "Name", "ProductId", "SeoAlias", "SeoDescription", "SeoTitle" },
+                values: new object[,]
+                {
+                    { 1, "Áo sơ mi nam trắng Việt Tiến", "Áo sơ mi nam trắng Việt Tiến", "vi-VN", "Áo sơ mi nam trắng Việt Tiến", 1, "ao-so-mi-nam-trang-Viet-Tien", "Áo sơ mi nam trắng Việt Tiến", "Áo sơ mi nam trắng Việt Tiến" },
+                    { 2, "Viet-Tien-men-T-shirt", "Viet-Tien-men-T-shirt", "vi-US", "Viet Tien Men T Shirt", 1, "Viet-Tien-men-T-shirt", "Viet-Tien-men-T-shirt", "Viet-Tien-men-T-shirt" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Carts_ProductId",
                 table: "Carts",
@@ -381,8 +539,8 @@ namespace eShopSolution.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImage_ProductId",
-                table: "ProductImage",
+                name: "IX_ProductImages_ProductId",
+                table: "ProductImages",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -401,15 +559,33 @@ namespace eShopSolution.Data.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transactions_AppUserId",
+                name: "IX_Transactions_UserId",
                 table: "Transactions",
-                column: "AppUserId");
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "AppConfigs");
+
+            migrationBuilder.DropTable(
+                name: "AppRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AppRoles");
+
+            migrationBuilder.DropTable(
+                name: "AppUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AppUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AppUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AppUserTokens");
 
             migrationBuilder.DropTable(
                 name: "Carts");
@@ -424,7 +600,7 @@ namespace eShopSolution.Data.Migrations
                 name: "OrderDetails");
 
             migrationBuilder.DropTable(
-                name: "ProductImage");
+                name: "ProductImages");
 
             migrationBuilder.DropTable(
                 name: "ProductInCategories");
@@ -451,7 +627,7 @@ namespace eShopSolution.Data.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "AppUser");
+                name: "AppUsers");
         }
     }
 }
