@@ -40,7 +40,7 @@ namespace eShopSolution.Application.System.Users
 
         {
             var user = await _userManager.FindByNameAsync(request.UserName);
-            if (user == null) return null; // throw new eShopException("can not find user name");
+            if (user == null) return new ApiErrorResult<string>("Tài khoản không tồn tại"); // throw new eShopException("can not find user name");
             var result = await _signInManager.PasswordSignInAsync(user, request.Password, request.RememberMe, true);
             if (!result.Succeeded)
             {
