@@ -69,11 +69,18 @@ namespace eShopSolutionBackendApi.Controllers
             return Ok(product);
         }
         //
-        [HttpGet("{id}")]  // alias  public_paging/
+        [HttpGet("{id}")]  
         public async Task<IActionResult> GetById(Guid id)
         {
             var user = await _userService.GetById(id);
             return Ok(user);
+        }
+
+        [HttpDelete("{id}")]  
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _userService.Delete(id);
+            return Ok(result);
         }
     }
 }

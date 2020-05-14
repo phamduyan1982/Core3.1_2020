@@ -16,33 +16,33 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace eShopSolution.Application.System.Users
 {
-    
+
     public class UserService : IUserService
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly RoleManager<AppRole> _roleManager;
         private readonly IConfiguration _config;
-        
+
         public UserService(UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             RoleManager<AppRole> roleManager,
-            
+
             IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
-         
+
             _config = config;
-        }       
-        public async  Task<ApiResult<String>> Authenticate(LoginRequest request)
+        }
+        public async Task<ApiResult<String>> Authenticate(LoginRequest request)
 
         {
             var user = await _userManager.FindByNameAsync(request.UserName);
             if (user == null) return null; // throw new eShopException("can not find user name");
-            var result = await  _signInManager.PasswordSignInAsync(user, request.Password, request.RememberMe,true);
-            if(!result.Succeeded)
+            var result = await _signInManager.PasswordSignInAsync(user, request.Password, request.RememberMe, true);
+            if (!result.Succeeded)
             {
                 return null;
             }
@@ -63,13 +63,26 @@ namespace eShopSolution.Application.System.Users
                 signingCredentials: creds);
 
             return new ApiSuccessResult<string>(new JwtSecurityTokenHandler().WriteToken(token));
-             
+
+        }
+
+        public async Task<ApiResult<bool>> Delete(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return new ApiErrorResult<bool>("User không tồn tại");
+            }
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+                return new ApiSuccessResult<bool>();
+            return new ApiErrorResult<bool>("Xóa không thành công");
         }
 
         public async Task<ApiResult<UserVm>> GetById(Guid id)
         {
-            var user =  await _userManager.FindByIdAsync(id.ToString());
-            if(user == null)
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
             {
                 return new ApiErrorResult<UserVm>("User không tồn tại");
             }
@@ -90,7 +103,7 @@ namespace eShopSolution.Application.System.Users
         public async Task<ApiResult<PagedResult<UserVm>>> GetUsersPaging(GetUserPagingRequest request)
         {
             var query = _userManager.Users;
-            if(!string.IsNullOrEmpty(request.Keyword))
+            if (!string.IsNullOrEmpty(request.Keyword))
             {
                 query = query.Where(x => x.UserName.Contains(request.Keyword)
                  || x.PhoneNumber.Contains(request.Keyword));
@@ -105,10 +118,10 @@ namespace eShopSolution.Application.System.Users
                 {
                     Email = x.Email,
                     PhoneNumber = x.PhoneNumber,
-                    UserName= x.UserName,
-                    FirstName =x.FirstName,
-                    Id= x.Id,
-                    LastName= x.LastName
+                    UserName = x.UserName,
+                    FirstName = x.FirstName,
+                    Id = x.Id,
+                    LastName = x.LastName
                 }).ToListAsync();
 
             //4. select and projection
@@ -125,14 +138,14 @@ namespace eShopSolution.Application.System.Users
 
         public async Task<ApiResult<bool>> Register(RegisterRequest request)
         {
-            var user = await _userManager.FindByNameAsync(request.UserName); 
-            if(user != null)
-            {                
-                return new ApiErrorResult<bool>("Tài khoản đã tồn tại"); 
+            var user = await _userManager.FindByNameAsync(request.UserName);
+            if (user != null)
+            {
+                return new ApiErrorResult<bool>("Tài khoản đã tồn tại");
             }
             if (await _userManager.FindByEmailAsync(request.Email) != null)
             {
-                return new ApiErrorResult<bool>("Email đã tồn tại"); 
+                return new ApiErrorResult<bool>("Email đã tồn tại");
             }
             user = new AppUser()
             {
@@ -174,7 +187,7 @@ namespace eShopSolution.Application.System.Users
             return new ApiErrorResult<bool>("Cập nhật không thành công");
         }
 
-      
+
 
     }
 }
