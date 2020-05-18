@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using eShopSolution.AdminApp.Services;
+using eShopSolution.ViewModels.Common;
 using eShopSolution.ViewModels.System.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -22,8 +23,13 @@ namespace eShopSolution.AdminApp.Controllers
     {
         private readonly IUserApiClient _userApiClient;
         private readonly IConfiguration _configuration;
-        public UserController(IUserApiClient userApiClient, IConfiguration configuration)
+        private readonly IRoleApiClient _roleApiClient;
+        public UserController(IUserApiClient userApiClient,
+            IConfiguration configuration,
+            IRoleApiClient roleApiClient
+            )
         {
+            _roleApiClient = roleApiClient;
             _userApiClient = userApiClient;
             _configuration = configuration;
         }
@@ -38,7 +44,7 @@ namespace eShopSolution.AdminApp.Controllers
             };
             var data = await _userApiClient.GetUsersPagings(request);
             ViewBag.Keyword = keyword;
-            if(TempData["result"] != null)
+            if (TempData["result"] != null)
             {
                 ViewBag.SuccessMsg = TempData["result"];
             }
@@ -46,7 +52,7 @@ namespace eShopSolution.AdminApp.Controllers
         }
 
         [HttpGet]
-        public async Task< IActionResult> Details(Guid id)
+        public async Task<IActionResult> Details(Guid id)
         {
             var result = await _userApiClient.GetById(id);
             return View(result.ResultObj);
@@ -107,7 +113,7 @@ namespace eShopSolution.AdminApp.Controllers
                 TempData["result"] = "Cập nhật thành công";
                 return RedirectToAction("Index");
             }
-                
+
             ModelState.AddModelError("", result.Message);
             return View(request);
         }
@@ -141,7 +147,7 @@ namespace eShopSolution.AdminApp.Controllers
                 return RedirectToAction("Index");
 
             }
-                
+
             ModelState.AddModelError("", result.Message);
             return View(request);
         }
@@ -158,6 +164,49 @@ namespace eShopSolution.AdminApp.Controllers
             validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
             ClaimsPrincipal princial = new JwtSecurityTokenHandler().ValidateToken(JwtToken, validationParameters, out validatedToken);
             return princial;
+        }
+
+        //
+        [HttpGet]
+        public  async Task<IActionResult> RoleAssign(Guid id)
+        {
+            var roleAssignRequest = await GetRoleAssignRequest(id);
+            return View(roleAssignRequest);
+        }
+        [HttpPost]
+        public async Task<IActionResult> RoleAssign(RoleAssignRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            var result = await _userApiClient.RoleAssign(request.Id, request);
+            if (result.IsSuccessed)
+            {
+                TempData["result"] = "Cập nhật quyền thành công";
+                return RedirectToAction("Index");
+            }
+
+            ModelState.AddModelError("", result.Message);
+            var roleAssignRequest = await GetRoleAssignRequest(request.Id);
+            return View(roleAssignRequest);
+        }
+        //
+        private async Task< RoleAssignRequest> GetRoleAssignRequest(Guid id)
+        {
+            var userObj = await _userApiClient.GetById(id);
+            var roleObj = await _roleApiClient.GetAll();
+            var roleAssignRequest = new RoleAssignRequest();
+            foreach (var role in roleObj.ResultObj)
+            {
+                roleAssignRequest.Roles.Add(new SelectItem()
+                {
+                    Id = role.Id.ToString(),
+                    Name = role.Name,
+                    Selected = userObj.ResultObj.Roles.Contains(role.Name)
+                });
+            }
+            return roleAssignRequest;
         }
     }
 }
